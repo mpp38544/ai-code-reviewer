@@ -1,20 +1,36 @@
 version: "3.8"
 
 services:
-  postgres:
-    image: postgres:15
-    container_name: postgres
-    environment:
-      POSTGRES_USER: code-reviewer
-      POSTGRES_PASSWORD: code-reviewer-123
-      POSTGRES_DB: code-reviewer-db
-      POSTGRES_HOST_AUTH_METHOD: trust
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    networks:
-      - code-reviewer-network
+    postgres:
+        image: postgres:15
+        container_name: postgres
+        environment:
+            POSTGRES_USER: code-reviewer
+            POSTGRES_PASSWORD: code-reviewer-123
+            POSTGRES_DB: code-reviewer-db
+            POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+            - "5433:5432"
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+        networks:
+            - code-reviewer-network
+
+    app:
+        build: .
+        ports:
+            - '3000:3000'
+        environment:
+            - DATABASE_URL=postgresql://code-reviewer:code-reviewer-123@postgres:5432/code-reviewer-db
+            - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
+            - GITHUB_TOKEN=${GITHUB_TOKEN}
+            - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+            - PORT=3000
+        depends_on:
+            - postgres
+        networks:
+            - code-reviewer-network
+
 
 networks:
   code-reviewer-network:
