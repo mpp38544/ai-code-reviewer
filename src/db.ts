@@ -3,10 +3,17 @@ import * as dotenv from 'dotenv'
 
 dotenv.config()
 
-const pool = new Pool({ connectionString : process.env.DATABASE_URL })
+let pool: Pool
+
+const getPool = () => {
+    if (!pool) {
+        pool = new Pool({ connectionString: process.env.DATABASE_URL })
+    }
+    return pool
+}
 
 export const intialiseDatabase = async () => { 
-    await pool.query(
+    await getPool().query(
         `CREATE TABLE IF NOT EXISTS reviews (
         id SERIAL PRIMARY KEY,
         repo VARCHAR(100),
@@ -20,7 +27,7 @@ export const intialiseDatabase = async () => {
 }
 
 export const saveReview = async (repo: string, pr_number: number, pr_title: string, diff: string, review: string) => {
-    await pool.query(
+    await getPool().query(
         `INSERT INTO reviews (repo, pr_number, pr_title, diff, review, created_at) VALUES ($1, $2, $3, $4, $5, NOW())`,
         [repo, pr_number, pr_title, diff, review]
     )
