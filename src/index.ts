@@ -2,16 +2,32 @@ import express from 'express'
 import * as dotenv from 'dotenv'
 import { fetchPullRequestDiff, postReviewComment } from './github.js'
 import { reviewCode } from './review.js'
+import { verifyGithubSignature } from './verify.js'
+import { intialiseDatabase, saveReview } from './db.js' 
 
-dotenv.config()
+dotenv.config();
+
+(async () => {
+    await intialiseDatabase()
+})().catch(console.error)
 
 const app = express()
 
 const port = process.env.PORT || 3000
 
-app.use(express.json())
+app.use(express.json({
+    verify: (req, res, buf) => {
+        (req as any).rawBody = buf.toString()
+    }
+}))
+
 
 app.post('/webhook', async (req, res) => {
+    if (!verifyGithubSignature(req.headers['x-hub-signature-256'] as string, req.rawBody ?? '', process.env.GITHUB_WEBHOOK_SECRET ?? '')) {
+        res.status(401).json({message : 'Invalid signature'})
+        return
+    }
+
     if (req.headers['x-github-event'] !== 'pull_request') {
         res.status(200).json({ message : 'ignored'})
         return
@@ -29,10 +45,15 @@ app.post('/webhook', async (req, res) => {
 
     console.log(`Pull Request Title: ${pull_request.title}`)
 
+    const owner = req.body.repository.owner.login
+    const repo = req.body.repository.name
+    const pull_request_number = pull_request.number
+    const title = pull_request.title
+
     const prDiff = await fetchPullRequestDiff( 
-        req.body.repository.owner.login,
-        req.body.repository.name,
-        pull_request.number,
+        owner,
+        repo,
+        pull_request_number
     )
     console.log(prDiff)
 
@@ -41,12 +62,12 @@ app.post('/webhook', async (req, res) => {
     console.log(review)
 
     await postReviewComment(
-        req.body.repository.owner.login,
-        req.body.repository.name,
-        pull_request.number,
-        review
+        owner, repo, pull_request_number, review
     )
 
+    await saveReview(
+        repo, pull_request_number, title, prDiff, review
+    )
 })
 
 
