@@ -1,8 +1,7 @@
 import express from 'express'
 import * as dotenv from 'dotenv'
-import { fetchPullRequestDiff } from './github.js'
+import { fetchPullRequestDiff, postReviewComment } from './github.js'
 import { reviewCode } from './review.js'
-
 
 dotenv.config()
 
@@ -40,6 +39,13 @@ app.post('/webhook', async (req, res) => {
     const review = await reviewCode(prDiff)
 
     console.log(review)
+
+    await postReviewComment(
+        req.body.repository.owner.login,
+        req.body.repository.name,
+        pull_request.number,
+        review
+    )
 
 })
 
