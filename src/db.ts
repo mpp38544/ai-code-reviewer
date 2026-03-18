@@ -30,3 +30,40 @@ export const saveReview = async (repo: string, pr_number: number, pr_title: stri
         [repo, pr_number, pr_title, diff, review]
     )
 }
+
+export const getReviews = async (repo?: string) => {
+    if (repo) {
+        const res = await getPool().query(
+            `SELECT * FROM reviews WHERE repo = $1 ORDER BY created_at DESC`,
+            [repo]
+        )
+        return res.rows
+    } else {
+        const res = await getPool().query(
+            `SELECT * FROM reviews ORDER BY created_at DESC`
+        )
+        return res.rows
+    }
+}
+
+export const getStats = async () => {
+    const totalReviewCount = await getPool().query(
+        `SELECT COUNT(*) FROM reviews;`
+    )
+        
+    const repoCount = await getPool().query(
+        `SELECT COUNT(DISTINCT repo) FROM reviews;`
+    )
+
+    const prCount = await getPool().query(
+        `SELECT COUNT(DISTINCT pr_number) FROM reviews;`
+    )
+
+    return {
+        totalReviews: parseInt(totalReviewCount.rows[0].count),
+        uniqueRepos: parseInt(repoCount.rows[0].count),
+        uniquePRs: parseInt(prCount.rows[0].count)
+    }
+}
+
+

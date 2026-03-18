@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/mpp38544/ai-code-reviewer#readme",
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^25.5.0",
     "@types/pg": "^8.18.0",
@@ -31,6 +32,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
     "@octokit/rest": "^22.0.1",
+    "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "pg": "^8.20.0"

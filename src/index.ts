@@ -3,9 +3,13 @@ import * as dotenv from 'dotenv'
 import { fetchPullRequestDiff, postReviewComment } from './github.js'
 import { reviewCode } from './review.js'
 import { verifyGithubSignature } from './verify.js'
-import { intialiseDatabase, saveReview } from './db.js' 
+import { intialiseDatabase, saveReview, getReviews, getStats } from './db.js' 
+import cors from 'cors'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
 
 dotenv.config();
+
 
 (async () => {
     await intialiseDatabase()
@@ -15,12 +19,19 @@ const app = express()
 
 const port = process.env.PORT || 3000
 
+
+app.use(cors())
 app.use(express.json({
     verify: (req, res, buf) => {
         (req as any).rawBody = buf.toString()
     }
 }))
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+console.log('Static path:', join(__dirname, '../client/dist'))
+
+// app.use(express.static(join(__dirname, '../client/dist')))
 
 app.post('/webhook', async (req, res) => {
     if (!verifyGithubSignature(req.headers['x-hub-signature-256'] as string, req.rawBody ?? '', process.env.GITHUB_WEBHOOK_SECRET ?? '')) {
@@ -71,7 +82,30 @@ app.post('/webhook', async (req, res) => {
 })
 
 
+app.get('/api/reviews', async (req, res) => {
+    try {
+        const reviews = await getReviews(req.query.repo as string)
+        res.status(200).json(reviews)
+    } catch (err) {
+        res.status(500).json({ message : 'Failed to fetch reviews'})
+    }
+})
+
+
+app.get('/api/stats', async (req, res) => {
+    try {
+        const stats = await getStats()
+        res.status(200).json(stats)
+    } catch (err) {
+        res.status(500).json({ message : 'Failed to fetch stats'})
+    }
+})
+
+
 app.listen(port, () => { 
     console.log(`Server Listening on port ${port}...`)
 })
 
+//app.get('/{*splat}', (req, res) => {
+//    res.sendFile(join(__dirname, '../client/dist/index.html'))
+//})
