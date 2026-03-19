@@ -16,7 +16,7 @@ export default function ReviewTable( {reviews, stats} : ReviewTableProps) {
     const pageSize = 10
 
     const totalPages = Math.ceil(reviews.length / pageSize)
-    reviews.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    const paginatedReviews = reviews.slice((currentPage - 1) * pageSize, currentPage * pageSize)
     
     const toggleRow = (id: number) => {
         setExpandedID(expandedID === id ? null : id)
@@ -30,7 +30,7 @@ export default function ReviewTable( {reviews, stats} : ReviewTableProps) {
     
     useEffect(() => {
         setCurrentPage(1)
-    }), [reviews]
+    }, [reviews])
 
     return (
         <div className="overflow-x-auto">
@@ -55,7 +55,7 @@ export default function ReviewTable( {reviews, stats} : ReviewTableProps) {
                         : reviews.length === 0 ?
                             <tr><td colSpan={5} className="text-s text-center text-gray-500">No Repositories found.</td></tr>
 
-                        : reviews.map((review) => {
+                        : paginatedReviews.map((review) => {
                             const isClean = review.review.includes('No significant issues found')
                             return (
                                 <>
