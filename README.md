@@ -17,32 +17,24 @@ An automated code review tool that integrates with GitHub pull requests. When a 
 
 ## Tech stack
 
-### Backend
-Node.js + Typescript
+Backend: Node.js + Typescript
 
-### Framework
-Express
+Framework: Express
 
-### AI
+AI
 Anthropic Claude API
 
-### Github Integration
-Octokit
+Github Integration: Octokit
 
-### Frontend
-React + Typescript + Vite
+Frontend: React + Typescript + Vite
 
-### Styling
-TailWind CSS
+Styling: TailWind CSS
 
-### Charts
-Rechart
+Charts: Rechart
 
-### Deployment
-Railway
+Deployment: Railway
 
-### CI
-Github Actions
+CI: Github Actions
 
 
 ## Architecture
