@@ -31,7 +31,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 console.log('Static path:', join(__dirname, '../client/dist'))
 
-// app.use(express.static(join(__dirname, '../client/dist')))
+app.use(express.static(join(__dirname, '../client/dist')))
 
 app.post('/webhook', async (req, res) => {
     if (!verifyGithubSignature(req.headers['x-hub-signature-256'] as string, req.rawBody ?? '', process.env.GITHUB_WEBHOOK_SECRET ?? '')) {
@@ -101,11 +101,10 @@ app.get('/api/stats', async (req, res) => {
     }
 })
 
+app.get('/{*splat}', (req, res) => {
+    res.sendFile(join(__dirname, '../client/dist/index.html'))
+})
 
 app.listen(port, () => { 
     console.log(`Server Listening on port ${port}...`)
 })
-
-//app.get('/{*splat}', (req, res) => {
-//    res.sendFile(join(__dirname, '../client/dist/index.html'))
-//})
