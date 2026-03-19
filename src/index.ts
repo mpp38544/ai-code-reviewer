@@ -39,7 +39,6 @@ app.use('/api', limiter)
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
-console.log('Static path:', join(__dirname, '../client/dist'))
 
 app.use(express.static(join(__dirname, '../client/dist')))
 
