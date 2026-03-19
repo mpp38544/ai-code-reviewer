@@ -2,6 +2,9 @@
 
 An automated code review tool that integrates with GitHub pull requests. When a PR is opened or updated, it fetches the diff, sends it to Anthropic Claude API for analysis, and posts a review comment on the PR. All reviews are logged to a PostgreSQL database and displayed in a real-time dashboard.
 
+It can be accessed using the following url:
+https://ai-code-reviewer-production-9d7f.up.railway.app/
+
 ## Features
 
 - Automatic PR review on every push
