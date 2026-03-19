@@ -3,7 +3,7 @@ import type { Review, Stats } from './types'
 import StatsBar from './components/StatsBar'
 import FilterBar from './components/FilterBar'
 import ReviewsTable from './components/ReviewsTable'
-import logo from './assets/claude_logo.png'
+import ReviewsChart from './components/ReviewsChart'
 
 export default function App() {
 
@@ -26,20 +26,24 @@ export default function App() {
 
     return (
         <div className="max-w-5xl mx-auto p-8">
-            <div className="flex items-center justify-between border-b border-gray-200 pb-5 mb-6">
+            <div className="inline-flex bg-red-50 px-3 py-1 rounded-full mb-3">
+                <p className='text-xs text-red-300 p-1'>Powered by Claude</p>
+            </div>
+            <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-200 pb-5 mb-6 gap-4">
                 <div>
                     <h1 className="text-2xl font-medium">GitHub AI Code Reviewer</h1>
                     <p className="text-sm text-gray-400 mt-1">Dashboard</p>
                 </div>
                 <div className="flex items-center gap-6">
                     <StatsBar stats={stats} />
-                    <div className="flex items-center gap-2 bg-purple-50 px-3 py-1 rounded-full">
-                        <img src={logo} alt="Claude" className="w-25 h-4" />
-                    </div>
                 </div>
             </div>
             <FilterBar filter={filter} setFilter={setFilter} fromDate={fromDate} setFromDate={setFromDate} toDate={toDate} setToDate={setToDate}/>
-            <ReviewsTable  reviews ={filteredReviews} stats={stats} />
+            <div className="mb-6">
+                <p className="text-sm text-gray-500 mb-3">Reviews per repository</p>
+                <ReviewsChart reviews={filteredReviews} />
+            </div>
+            <ReviewsTable reviews={filteredReviews} stats={stats} />
         </div>
     )
 }
