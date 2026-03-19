@@ -7,6 +7,7 @@ import { intialiseDatabase, saveReview, getReviews, getStats } from './db.js'
 import cors from 'cors'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
+import rateLimit from 'express-rate-limit'
 
 dotenv.config();
 
@@ -26,6 +27,14 @@ app.use(express.json({
         (req as any).rawBody = buf.toString()
     }
 }))
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    message : {error: 'Too many requests, try again later.'}
+})
+
+app.use('/api', limiter)
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -80,7 +89,6 @@ app.post('/webhook', async (req, res) => {
         repo, pull_request_number, title, prDiff, review
     )
 })
-
 
 app.get('/api/reviews', async (req, res) => {
     try {
